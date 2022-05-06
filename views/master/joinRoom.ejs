@@ -1,0 +1,57 @@
+<%- include('../layouts/layout.ejs'); %>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <h2>Join Video Room</h2>
+                    <div class="card-body">
+                        <form id="roomInput">
+                            <div class="form-group">
+                                <label for="Room-Name" class="cols-sm-2 control-label">Room Name</label>
+                                <div class="cols-sm-10">
+                                    <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                                    <input type="text" class="form-control" name="Room-Name" id="roomName" placeholder="Enter your Room Name" />
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <input class="btn btn-primary btn-lg btn-block login-button" type="submit" value="Join Room">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <a href="/" class="row justify-content-center">
+                    <p>Create Room</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    </body>
+
+    </html>
+    <script>
+        // When the submit button is clicked send the roomName input via an ajax POST
+        // this checks if the room exists and then redictes the user to join if it does
+        $("#roomInput").submit(function(e) {
+            e.preventDefault();
+            let roomName = $("#roomName").val();
+            if (!roomName || roomName === "") {
+                $("#roomName").addClass('is-invalid');
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/video/join-room",
+                    data: {
+                        roomName: $("#roomName").val()
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        window.location.href = "/video/";
+                    }
+                })
+            }
+        });
+    </script>

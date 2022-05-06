@@ -1,0 +1,101 @@
+<%- include('../layouts/layout.ejs'); %>
+
+    <div class="modal" id="modal-1" tabindex="-1" role="dialog" data-overlay-dismissal-disabled="true" data-esc-dismissal-disabled="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="nameInput" class="m-0 p-0">
+                    <div class="form-group">
+                        <label for="username" class="required">Enter Username</label>
+                        <input type="text" id="username" class="form-control" placeholder="Username">
+                    </div>
+                    <div class="text-right">
+                        <input class="text-right btn btn-primary" type="submit" value="Save">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <h2>Create Video Room</h2>
+                    <div class="card-body">
+                        <form id="roomInput">
+                            <div class="form-group">
+                                <label for="Room-Name" class="cols-sm-2 control-label">Enter Your Room Name</label>
+                                <div class="cols-sm-10">
+                                    <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                                    <input type="text" class="form-control" name="Room-Name" id="roomName" placeholder="Room Name" />
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <input class="btn btn-primary btn-lg btn-block login-button" type="submit" value="Create Room">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <a href="/join-room" class="row justify-content-center">
+                    <p>Join Existing Room</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    </body>
+
+    </html>
+    <script>
+        <% if(typeof username == 'undefined'){ %>
+        halfmoon.toggleModal('modal-1')
+        <%}%>
+        // When the submit button is clicked send the roomName input via an ajax POST
+        // this creates a new room if the room isnt already taken and redirects the user 
+        $("#roomInput").submit(function(e) {
+            e.preventDefault();
+            let roomName = $("#roomName").val();
+            if (!roomName || roomName === "") {
+                $("#roomName").addClass('is-invalid');
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/video/create-room",
+                    data: {
+                        roomName: $("#roomName").val()
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        window.location.href = "/video/";
+                    }
+                })
+            }
+        });
+        // When the submit button is clicked send the users name input via an ajax POST
+        // this is stored in the session and used to generate the Twilio token
+        $("#nameInput").submit(function(e) {
+            e.preventDefault();
+            let userName = $("#username").val();
+            if (!userName || userName === "") {
+                $("#username").addClass('is-invalid');
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/video/name-input",
+                    data: {
+                        userName
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        halfmoon.toggleModal('modal-1')
+                    }
+                })
+            }
+        });
+    </script>

@@ -1,0 +1,272 @@
+<%- include('../layouts/layout.ejs'); %>
+    <div class="container">
+        <!-- <div class="row">
+            <h2>Video Interview</h2>
+        </div> -->
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card p-0" id="main_video_view" style='width: 100%; overflow: hidden;'>
+                    <h1 id="Waiting">Waiting on candidate</h1>
+                    <div class="">
+                        <div id="textbox"></div>
+                        <div id="instructions"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+
+            </div>
+            <div class="col-md-4">
+                <div class="card localView p-0">
+                    <div id="localMedia">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <button id="camToggle" class="btn btn-primary btn-lg btn-block login-button camOn">Cam</button>
+                        </td>
+                        <td>
+                            <button id="micToggle" class="btn btn-primary btn-lg btn-block login-button micOn">Mic</button>
+                        </td>
+                        <td>
+                            <button id="leave" class="btn btn-primary btn-lg btn-block login-button">Leave</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    </body>
+
+    </html>
+    <style>
+        .localView {
+            transform: scale(-1, 1);
+        }
+        
+        .topicView {
+            padding: 0 !important;
+        }
+        
+        video {
+            width: 100%;
+            overflow: hidden;
+            border-radius: var(--card-border-radius);
+            border: var(--card-border-width) solid var(--lm-card-border-color);
+        }
+    </style>
+    <script src="//sdk.twilio.com/js/video/releases/2.17.1/twilio-video.min.js"></script>
+    <script>
+        const Video = Twilio.Video;
+        const mainMediaView = document.getElementById('main_video_view');
+        const localMediaView = document.getElementById('localMedia');
+        const remoteMediaView = document.getElementById('remoteMedia');
+        //show local video track
+        Video.createLocalVideoTrack().then(track => {
+            $('#localMedia').append('<div class="video-container" style="height: inherit; "> </div>');
+            localMediaView.appendChild(track.attach());
+        });
+        //connect to a room using the token
+        Video.connect('<%= token %>', {
+            name: '<%= roomName %>',
+            audio: true,
+            video: true,
+            dominantSpeaker: true
+        }).then(room => {
+            const localParticipant = room.localParticipant;
+            console.log(`Connected to the Room as LocalParticipant "${ localParticipant.identity }"`);
+
+            //controls for participant's that connect after you.
+            room.on('participantConnected', participant => {
+                participant.tracks.forEach(publication => {
+                    if (publication.isSubscribed) {
+                        document.getElementById(participant.identity).appendChild(publication.track.attach());
+                    }
+                    publication.on('unsubscribed', () => {
+                        console.log('remote screen share off')
+                    });
+                });
+                participant.on('trackSubscribed', track => {
+                    console.log(track);
+                    document.getElementById(participant.identity).appendChild(track.attach());
+                });
+                participant.on('trackDisabled', track => {
+                    if (track.kind == 'video') {
+                        let videoDiv = ('#' + participant.identity + ' video')
+                        $(videoDiv).hide();
+                        $('#' + participant.identity).append('<img id="' + participant.identity + '-profileImage" src="https://eu.ui-avatars.com/api/?size=128&amp;background=698afb&amp;color=ffffff&amp;name=' + participant.identity + '">');
+                    } else {
+                        $('#' + participant.identity).append('<p id="' + participant.identity + '-mute">Muted</p>');
+                    }
+                });
+                participant.on('trackEnabled', track => {
+                    if (track.kind == 'video') {
+                        let videoDiv = ('#' + participant.identity + ' video')
+                        $(videoDiv).show();
+                        $('#' + participant.identity + '-profileImage').remove();
+                    } else {
+                        $('#' + participant.identity + '-mute').remove();
+                    }
+                });
+            });
+
+            //controls for participant's already in the room when you connect.
+            room.participants.forEach(participant => {
+                console.log(`Participant "${ participant.identity }" is connected to the Room`);
+                $('#main_video_view').append('<div id=' + participant.identity + ' style="width: inherit;"> </div>');
+                // $('#' + participant.identity).append('<p class="participantName">' + participant.identity + '</p>')
+                $('#Waiting').hide()
+
+                participant.tracks.forEach(publication => {
+                    if (publication.track) {
+                        document.getElementById(participant.identity).appendChild(publication.track.attach());
+                    }
+                    publication.on('unsubscribed', () => {
+                        console.log('remote screen share off')
+                    });
+                });
+                participant.on('trackSubscribed', track => {
+                    document.getElementById(participant.identity).appendChild(track.attach());
+                });
+
+                participant.on('trackDisabled', track => {
+                    if (track.kind == 'video') {
+                        let videoDiv = ('#' + participant.identity + ' video')
+                        $(videoDiv).hide();
+                        $('#' + participant.identity).append('<img id="' + participant.identity + '-profileImage" src="https://eu.ui-avatars.com/api/?size=128&amp;background=698afb&amp;color=ffffff&amp;name=' + participant.identity + '">');
+                    } else {
+                        $('#' + participant.identity).append('<p id="' + participant.identity + '-mute">Muted</p>');
+                    }
+                });
+                participant.on('trackEnabled', track => {
+                    if (track.kind == 'video') {
+                        let videoDiv = ('#' + participant.identity + ' video')
+                        $(videoDiv).show();
+                        $('#' + participant.identity + '-profileImage').remove();
+                    } else {
+                        $('#' + participant.identity + '-mute').remove();
+                    }
+                });
+            });
+
+            // Log new Participants as they connect to the Room
+            room.once('participantConnected', participant => {
+                console.log(`Participant "${ participant.identity }" has connected to the Room`);
+                $('#main_video_view').append('<div id=' + participant.identity + ' style="width: inherit;"> </div>');
+                $('#' + participant.identity).append('<p class="participantName">' + participant.identity + '</p>')
+                $('#Waiting').hide()
+            });
+
+            // Log Participants as they disconnect from the Room
+            room.once('participantDisconnected', participant => {
+                console.log(`Participant "${ participant.identity }" has disconnected from the Room`);
+                $('#' + participant.identity).remove();
+            });
+
+            //Button controlls
+            //local camera on off
+            $('#camToggle').click(function() {
+                    if ($('#camToggle').hasClass('camOn')) {
+                        $('#camToggle').removeClass('camOn');
+                        $('#camToggle').addClass('camOff');
+                        room.localParticipant.videoTracks.forEach(publication => {
+                            publication.track.disable();
+                        });
+                        console.log('Local video disabled');
+                    } else {
+                        $('#camToggle').removeClass('camOff');
+                        $('#camToggle').addClass('camOn');
+                        room.localParticipant.videoTracks.forEach(publication => {
+                            publication.track.enable();
+                        });
+                        console.log('Local video enable');
+                    }
+                })
+                //local mic on off
+            $('#micToggle').click(function() {
+                    if ($('#micToggle').hasClass('micOn')) {
+                        $('#micToggle').removeClass('micOn');
+                        $('#micToggle').addClass('micff');
+                        room.localParticipant.audioTracks.forEach(publication => {
+                            publication.track.disable();
+                        });
+                        console.log('Local mic off');
+                    } else {
+                        $('#micToggle').removeClass('micOff');
+                        $('#micToggle').addClass('micOn');
+                        room.localParticipant.audioTracks.forEach(publication => {
+                            publication.track.enable();
+                        });
+                        console.log('Local mic on');
+                    }
+                })
+                //leave and redirect
+            $('#leave').click(function() {
+                room.disconnect();
+                window.location.href = "/transcript/view";
+            });
+        }, error => {
+            console.error(`Unable to connect to Room: `);
+            console.log(error);
+        });
+        // starrt the transcript
+        if ("webkitSpeechRecognition" in window) {
+            // Initialize webkitSpeechRecognition
+            let speechRecognition = new webkitSpeechRecognition();
+            // Set the properties for the Speech Recognition object
+            speechRecognition.continuous = true;
+            speechRecognition.lang = 'en-UK';
+            speechRecognition.start();
+
+            //if it ends restart speech recognition
+            speechRecognition.onend = () => {
+                recognizing = false;
+                console.log('speech ended')
+                if (!recognizing) {
+                    speechRecognition.start();
+                }
+            };
+
+
+            //
+            speechRecognition.onresult = (event) => {
+                let final_transcript = "";
+                // loop through the results from the speech recognition object.
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    //if the result is final add it to the final_transcript string
+                    if (event.results[i].isFinal) {
+                        final_transcript += event.results[i][0].transcript;
+                    }
+                }
+                //post the final transcript to the backend to analyise it for topics
+                //using an ajax post request
+                if (final_transcript) {
+                    var date = new Date();
+                    console.log(date.toUTCString() + ' Text: ' + final_transcript)
+                    $.ajax({
+                        type: "POST",
+                        url: "/video/topicData",
+                        data: {
+                            transcript: final_transcript
+                        },
+                        error: function(xhr, status, error) {
+                            var data = JSON.parse(xhr.responseText);
+                            alert(data.msg);
+                        },
+                        success: function(data) {
+                            console.log(data);
+                        }
+                    })
+                }
+            };
+        } else {
+            console.log("Speech Recognition Not Available");
+        }
+    </script>

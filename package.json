@@ -1,0 +1,40 @@
+{
+    "name": "fp_p",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "develop": "node index.js",
+        "start": "node index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^5.0.1",
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.19.0",
+        "canvas": "^2.9.1",
+        "dotenv": "^16.0.0",
+        "ejs": "^3.1.7",
+        "express": "^4.17.1",
+        "express-session": "^1.17.2",
+        "font-awesome": "^4.7.0",
+        "jsdom": "^19.0.0",
+        "knex": "^1.0.3",
+        "mariadb": "^3.0.0",
+        "mongoose": "^6.0.13",
+        "node-fetch": "^2.0.0",
+        "passport": "^0.5.0",
+        "passport-local": "^1.0.0",
+        "pdf-creator-node": "^2.3.4",
+        "python-shell": "^3.0.1",
+        "request": "^2.88.2",
+        "twilio": "^3.71.3",
+        "twilio-video": "^2.18.1",
+        "wordcloud": "^1.2.2"
+    },
+    "devDependencies": {
+        "knex-mariadb": "^2.0.0"
+    },
+    "description": ""
+}

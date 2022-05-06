@@ -1,0 +1,33 @@
+<%- include('../layouts/layout.ejs'); %>
+
+    <!-- <%= JSON.stringify(transcripts) %> -->
+    <div class="container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <table class="table">
+                        <tbody>
+                            <% for(var i=0; i<transcripts.length; i++) {%>
+                                <tr>
+                                    <th>
+                                        <%= transcripts[i].roomName  %>
+                                            <p>
+                                                <%= transcripts[i].created_at.toISOString().substring(0, 10); %>
+                                            </p>
+                                    </th>
+                                    <td>
+                                        <a href="/transcript/view/?room_name=<%= transcripts[i].roomName  %>"><button class="btn btn-primary btn-lg btn-block login-button justify-content-center">View Transcript</button></a>
+                                    </td>
+                                    <td>
+                                        <a href='/pdf/download/?room_name=<%= transcripts[i].roomName %>' target="_blank"><button class="download-pdf btn btn-primary btn-lg btn-block login-button  justify-content-center" <% if (transcripts[i].pdfGenerated == 0){ %> disabled="disabled" <% } %> >Download PDF</button></a>
+                                    </td>
+                                    <td>
+                                        <a href='/pdf/download_wordcloud/?room_name=<%= transcripts[i].roomName %>' target="_blank"><button class="download-wordcloud btn btn-primary btn-lg btn-block login-button  justify-content-center" <% if (transcripts[i].wordCloudGenerated==0 ){ %> disabled="disabled" <% } %> >Download WordCloud</button></a>
+                                    </td>
+                                </tr>
+                                <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>

@@ -1,0 +1,370 @@
+<%- include('../layouts/layout.ejs'); %>
+    <div class="modal" id="edit-modal" tabindex="-1" role="dialog" data-overlay-dismissal-disabled="true" data-esc-dismissal-disabled="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <h5 class="modal-title">Edit Transcript Segment</h5>
+                <form action="..." method="...">
+                    <div class="form-group">
+                        <label for="em_transcript">Transcript</label>
+
+                        <textarea id="em_transcript" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="em_tag">Tag</label>
+                        <input type="text" id="em_tag" class="form-control">
+                    </div>
+                </form>
+                <div class="text-right mt-20">
+                    <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                    <a href="#" class="btn mr-5 close-edit-modal" role="button">Cancel</a>
+                    <a href="#" class="btn btn-primary update-entry" role="button">Save</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="delete-modal" tabindex="-1" role="dialog" data-overlay-dismissal-disabled="true" data-esc-dismissal-disabled="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <h5 class="modal-title">Are you sure?</h5>
+                <p>This action is permenant and cannot be undone.</p>
+                <div class="text-right mt-20">
+                    <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                    <a href="#" class="btn mr-5 close-delete-modal" role="button">Cancel</a>
+                    <a href="#" class="btn btn-danger delete-entry" role="button">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <% if (transcript.length > 0) {%>
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+
+                    <h2>
+                        <%= roomName %> - Transcript
+                    </h2>
+                    <ul class="no-bullets">
+                        <% for(var i=0; i<transcript.length; i++) {%>
+                            <% if(userName == transcript[i].speakerName){ %>
+                                <li id="<%= transcript[i].transcriptID  %>" value="<%= transcript[i].transcriptID  %>" class="col-9" style="float:left">
+                                    <% } else{%>
+
+                                        <li id="<%= transcript[i].transcriptID  %> " value="<%= transcript[i].transcriptID  %>" class="col-9" style="float:right">
+                                            <% } %>
+                                                <div class="card p-0 m-0">
+                                                    <div class="row">
+                                                        <div class="col-2 p-10">
+                                                            <img src="https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=<%= transcript[i].speakerName %>&rounded=true" alt="User Avatar">
+                                                        </div>
+                                                        <div class='col-8 p-10'>
+                                                            <p id="<%= transcript[i].transcriptID  %>-transcript">
+                                                                <%= transcript[i].transcriptSegment %>
+                                                            </p>
+                                                        </div>
+                                                        <div class='col-2 p-10 '>
+                                                            <div class="row">
+                                                                <a class="edit-entry-m" value="<%= transcript[i].transcriptID  %>" style="display: inline-block; width: 28px; height: 28px; background-color: #bebebe; border-radius: 50%; text-align: center; line-height: 28px; font-size: 15px;margin-bottom: 4px;"><span class="fa fa-pencil color-white">E</span></a>
+                                                                <a class="delete-entry-m" value="<%= transcript[i].transcriptID  %>" style="display: inline-block; width: 28px; height: 28px; background-color: #bebebe; border-radius: 50%; text-align: center; line-height: 28px; font-size: 15px;margin-bottom: 4px;"><span class="fa fa-pencil color-white">D</span></a>
+                                                            </div>
+                                                            <p id="<%= transcript[i].transcriptID  %>-tag">
+                                                                <%= transcript[i].labelA %>
+                                                            </p>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                        </li>
+                                        <% } %>
+                    </ul>
+                </div>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div><button class="reanalyise-transcript btn btn-primary btn-lg btn-block login-button justify-content-center">Reanalyse</button></div>
+                                            </td>
+                                            <% if (transcriptDetails.pdfGenerated == 1){ %>
+                                                <td>
+                                                    <div><button class="download-pdf btn btn-primary btn-lg btn-block login-button justify-content-center">Download PDF</button></div>
+                                                </td>
+                                                <% }else{ %>
+                                                    <td>
+                                                        <div><button class="generate-pdf btn btn-primary btn-lg btn-block login-button justify-content-center">Generate PDF</button></div>
+                                                    </td>
+                                                    <% } %>
+                                                        <% if (transcriptDetails.wordCloudGenerated == 1){ %>
+                                                            <td>
+                                                                <div><button class="download-wordcloud btn btn-primary btn-lg btn-block login-button  justify-content-center">Download WordCloud</button></div>
+                                                            </td>
+                                                            <% }else{ %>
+                                                                <td>
+                                                                    <div><button class="generate-wordcloud btn btn-primary btn-lg btn-block login-button justify-content-center">Generate WordCloud</button></div>
+                                                                </td>
+                                                                <% } %>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            <% } else {%>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <h2>The transcript is empty, have you started the call yet?</h2>
+                                <a href="/video/video-call">
+                                    <button class="btn btn-primary btn-lg btn-block login-button">Join</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <% }; %>
+
+    </div>
+    </div>
+    </div>
+    <style>
+        ul.no-bullets {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+    <script>
+        //Turns every transcript element into an objext with simple functions
+        //Ajax requests to server endpoints for handling transcript functions
+        class transcript {
+            constructor(segment, tag, id) {
+                this.segment = segment;
+                this.tag = tag;
+                this.id = id;
+            };
+            openEditModal() {
+                $.ajax({
+                    type: "POST",
+                    url: "/transcript/get-transcript-segment",
+                    dataType: 'json',
+                    data: {
+                        key: this.id,
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        halfmoon.toggleModal('edit-modal')
+                        $('#em_transcript').val(data[0].transcriptSegment);
+                        $('#em_tag').val(data[0].labelA);
+                        $('.update-entry').attr('value', data[0].transcriptID)
+                    }
+                })
+                return;
+            };
+
+            reanalyiseTranscriptSegment() {
+                let id = this.id;
+                $.ajax({
+                    type: "POST",
+                    url: "/transcript/reanalyise-transcript-segment",
+                    data: {
+                        key: id
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        $('#' + id + '-tag').text(data)
+                    }
+                })
+            }
+
+            updateTranscriptSegment() {
+                let id = this.id;
+                $.ajax({
+                    type: "POST",
+                    url: "/transcript/update-transcript-segment",
+                    data: {
+                        transcriptSegment: $('#em_transcript').val(),
+                        tag: $('#em_tag').val(),
+                        key: id,
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        $('#' + id + '-transcript').text($('#em_transcript').val());
+                        $('#' + id + '-tag').text($('#em_tag').val());
+                        // 
+                        $(".download-pdf").addClass('generate-pdf').removeClass('download-pdf');
+                        $(".generate-pdf").html('Generate PDF');
+                        $(".download-wordcloud").addClass('generate-wordcloud').removeClass('download-wordcloud');
+                        $(".generate-wordcloud").html('Generate Wordcloud');
+                        // 
+                        halfmoon.toggleModal('edit-modal')
+                    }
+                })
+                return;
+
+            };
+
+            openDeleteModal() {
+                $.ajax({
+                    type: "POST",
+                    url: "/transcript/get-transcript-segment",
+                    dataType: 'json',
+                    data: {
+                        key: this.id,
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        halfmoon.toggleModal('delete-modal')
+                        $('.delete-entry').attr('value', data[0].transcriptID)
+                    }
+                })
+                return;
+            };
+
+            deleteEntry(a) {
+                let id = this.id;
+                $.ajax({
+                    type: "POST",
+                    url: "/transcript/delete-transcript-segment",
+                    data: {
+                        key: id
+                    },
+                    error: function(xhr, status, error) {
+                        var data = JSON.parse(xhr.responseText);
+                        alert(data.msg);
+                    },
+                    success: function(data) {
+                        $("[value=" + id + "]").remove();
+                        // 
+                        $(".download-pdf").addClass('generate-pdf').removeClass('download-pdf');
+                        $(".generate-pdf").html('Generate PDF');
+                        $(".download-wordcloud").addClass('generate-wordcloud').removeClass('download-wordcloud');
+                        $(".generate-wordcloud").html('Generate Wordcloud');
+                        // 
+                        halfmoon.toggleModal('delete-modal');
+                    }
+                })
+                return;
+            };
+        }
+        //Items stores all transcript objects 
+        var items = {};
+        var transcriptData = <%- JSON.stringify(transcript) %>;
+        //add each transcript object from EJS to the items 
+        for (var i = 0; i < transcriptData.length; i++) {
+            let ct = transcriptData[i]
+            items[ct.transcriptID] = new transcript(ct.transcriptSegment, ct.labelA, ct.transcriptID)
+        }
+
+        //Transcript buttons that trigger events for the items{} objects
+        $("body").on("click", ".edit-entry-m", function(e) {
+            var entry_key = $(this).attr("value");
+            items[entry_key].openEditModal();
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".update-entry", function(e) {
+            var entry_key = $(this).attr("value");
+            items[entry_key].updateTranscriptSegment();
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".close-edit-modal", function(e) {
+            halfmoon.toggleModal('edit-modal')
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".close-delete-modal", function(e) {
+            halfmoon.toggleModal('delete-modal')
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".delete-entry-m", function(e) {
+            var entry_key = $(this).attr("value");
+            items[entry_key].openDeleteModal();
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".delete-entry", function(e) {
+            var entry_key = $(this).attr("value");
+            items[entry_key].deleteEntry($(this));
+            e.preventDefault();
+        })
+
+
+        //PDF and reanalyse controls
+        $("body").on("click", ".reanalyise-transcript", function(e) {
+            for (let key in items) {
+                items[key].reanalyiseTranscriptSegment();
+            }
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".generate-pdf", function(e) {
+            $.ajax({
+                type: "POST",
+                url: "/pdf/generate",
+                error: function(xhr, status, error) {
+                    var data = JSON.parse(xhr.responseText);
+                    alert(data.msg);
+                },
+                success: function(data) {
+                    // If successfull change the generate button to a download button
+                    $(".generate-pdf").addClass('download-pdf').removeClass('generate-pdf');
+                    $(".download-pdf").html('Download PDF');
+                }
+            })
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".download-pdf", function(e) {
+            window.open('/pdf/download/?room_name=<%= roomName %>', 'Download');
+            e.preventDefault();
+        })
+
+        $("body").on("click", ".generate-wordcloud", function(e) {
+            $.ajax({
+                type: "POST",
+                url: "/pdf/generate_wordcloud",
+                error: function(xhr, status, error) {
+                    var data = JSON.parse(xhr.responseText);
+                    alert(data.msg);
+                    alert(xhr.responseText);
+                },
+                success: function(data) {
+                    // If successfull change the generate button to a download button
+                    $(".generate-wordcloud").addClass('download-wordcloud').removeClass('generate-wordcloud');
+                    $(".download-wordcloud").html('Download Wordcloud');
+                }
+            })
+            e.preventDefault();
+        })
+
+
+        $("body").on("click", ".download-wordcloud", function(e) {
+            window.open('/pdf/download_wordcloud/?room_name=<%= roomName %>', 'Download');
+            e.preventDefault();
+        })
+    </script>
